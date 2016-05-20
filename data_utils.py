@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+import sys, tarfile
 import os
 import re
 import numpy as np
@@ -11,6 +12,11 @@ def load_task(data_dir, task_id, only_supporting=False):
     '''
     assert task_id > 0 and task_id < 21
 
+    if data_dir.endswith(".tar") or data_dir.endswith(".tar.gz"):
+        data_dir = untar(data_dir)
+    if not data_dir:
+        return 0
+
     files = os.listdir(data_dir)
     files = [os.path.join(data_dir, f) for f in files]
     s = 'qa{}_'.format(task_id)
@@ -19,6 +25,28 @@ def load_task(data_dir, task_id, only_supporting=False):
     train_data = get_stories(train_file, only_supporting)
     test_data = get_stories(test_file, only_supporting)
     return train_data, test_data
+
+
+def untar(fname):
+    if (fname.endswith("tar") or fname.endswith("tar.gz")):
+        tar = tarfile.open(fname)
+        tar.extractall()
+        tar.close()
+
+        # find the dir name where the untarred files are
+        # convention: 'filename.untar-target-dir.tar'
+        paths = fname.split('.')
+        dirname = 0
+        for sub in reversed(paths):
+            if sub == 'tar' or sub == 'gz':
+                continue
+            dirname = sub
+            break
+        print ("Extracted in ", dirname)
+        return dirname
+    else:
+        print "Not a tar.gz file: '%s '" % sys.argv[0]
+    return 0
 
 def tokenize(sent):
     '''Return the tokens of a sentence including punctuation.

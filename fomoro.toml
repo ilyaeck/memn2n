@@ -1,0 +1,7 @@
+name = "memn2n-babi"
+repo = "https://github.com/ilyaeck/memn2n.git"
+description = "MemN2N Babi for training on Fomoro."
+environment = "tensorflow"
+
+[datasets]
+"babi-en-1k"="1.0.1"
